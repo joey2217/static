@@ -3,3 +3,14 @@
 .main {
   padding: 8px;
 }
+
+#header {
+  height: 40px;
+  line-height: 40px;
+  border: 1px solid #262626;
+  padding: 0 20px;
+}
+
+.upload {
+  text-align: center;
+}
