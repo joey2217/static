@@ -9,6 +9,8 @@
   line-height: 40px;
   border: 1px solid #262626;
   padding: 0 20px;
+  text-align: center;
+  font-size: 20px;
 }
 
 .upload {

@@ -77,7 +77,9 @@ const UploadPage: React.FC = () => {
             message.error(error.response.data.message || '上传失败!')
             const index = fileList.findIndex((f) => f.name === name)
             if (index === -1) {
-              setFileList((list) => list.concat({ name, url: BASE_URL + name }))
+              const data = { name, url: BASE_URL + name }
+              setFileList((list) => list.concat(data))
+              insert(data)
             }
           } else if (error.request) {
             console.log(error.request, 'request')
@@ -159,7 +161,7 @@ const UploadPage: React.FC = () => {
       {fileList.map((file) => (
         <Col {...colProps} key={file.name}>
           <Image src={file.url} alt={file.name} />
-          <Paragraph ellipsis copyable>
+          <Paragraph ellipsis={{ tooltip: file.url }} copyable>
             {file.url}
           </Paragraph>
         </Col>

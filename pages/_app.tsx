@@ -7,7 +7,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>Static</title>
+        <title>💾Static💼</title>
         <meta name="description" content="static assets,upload" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
