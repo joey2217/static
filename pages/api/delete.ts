@@ -1,8 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import axios from 'axios'
 
-// delete with get sha
-
 type Data = {
   message: string
 }
@@ -16,15 +14,7 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   try {
-    const { path } = req.query
-    const { data: fileData } = await axios({
-      url: BASE_URL + path,
-      method: 'GET',
-      params: {
-        access_token: STATIC_TOKEN,
-      },
-    })
-    const { sha } = fileData as any
+    const { path, sha } = req.query
     await axios({
       url: BASE_URL + path,
       method: 'DELETE',
@@ -38,8 +28,10 @@ export default async function handler(
       message: 'delete ' + path + ' success!',
     })
   } catch (error: any) {
-    res
-      .status(error.response.status)
-      .json({ message: error.response.data.message || 'Something Wrong!' })
+    const status = (error.response && error.response.status) || 500
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      'Something Wrong!'
+    res.status(status).json({ message })
   }
 }

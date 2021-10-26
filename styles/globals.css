@@ -16,3 +16,10 @@
 .upload {
   text-align: center;
 }
+
+.delete-icon {
+  text-align: center;
+}
+.delete-icon svg {
+  cursor: pointer;
+}

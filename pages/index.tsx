@@ -1,8 +1,17 @@
 import React, { memo, useEffect, useState } from 'react'
-import { Upload, Row, Col, ColProps, message, Image, Typography } from 'antd'
+import {
+  Upload,
+  Row,
+  Col,
+  ColProps,
+  message,
+  Image,
+  Typography,
+  Modal,
+} from 'antd'
 import axios from 'axios'
 import { RcFile } from 'antd/lib/upload'
-import { insert, select } from '../utils/db'
+
 const { Paragraph } = Typography
 
 const colProps: ColProps = {
@@ -13,11 +22,19 @@ const colProps: ColProps = {
   xl: 3,
 }
 interface ImageData {
+  download_url: string
+  html_url: string
   name: string
+  path: string
+  sha: string
+  size?: number
+  type: string
   url: string
 }
 
-const BASE_URL = 'https://gitee.com/burning2017/test-page/raw/master/static/'
+const BASE_URL =
+  'https://gitee.com/api/v5/repos/burning2017/test-page/contents/static/'
+const TOKEN = 'f39de59251d78ec3695ff7bc573c70ac'
 
 const UploadPage: React.FC = () => {
   const [file, setFile] = useState<RcFile | null>(null)
@@ -36,57 +53,47 @@ const UploadPage: React.FC = () => {
   }, [file])
 
   useEffect(() => {
-    select().then((list) => {
-      setFileList(list)
+    axios({
+      url: '/api/files',
+      method: 'GET',
     })
+      .then(({ data }) => {
+        setFileList(data as ImageData[])
+      })
+      .catch((err) => {
+        console.error(err)
+      })
   }, [])
 
   useEffect(() => {
     if (fileUrl && file) {
       const { name } = file
       const data = new FormData()
-      data.append('access_token', 'f39de59251d78ec3695ff7bc573c70ac')
+      data.append('access_token', TOKEN)
       data.append('content', fileUrl)
       data.append('message', 'add file ' + name)
       axios({
-        url:
-          'https://gitee.com/api/v5/repos/burning2017/test-page/contents/static/' +
-          name,
+        url: BASE_URL + name,
         method: 'POST',
         data,
       })
         .then((res) => {
           const {
             commit: { message: msg },
-            content: { download_url, name },
+            content,
           } = res.data as any
-          const data = { name, url: download_url }
-          setFileList((list) => list.concat(data))
-          insert(data)
-            .then(() => {
-              message.success(msg)
-            })
-            .catch((err) => {
-              throw err
-            })
+          setFileList((list) => list.concat(content as ImageData))
+          message.success(msg)
         })
         .catch((error) => {
           if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
+            console.error(error.response)
             message.error(error.response.data.message || '上传失败!')
-            const index = fileList.findIndex((f) => f.name === name)
-            if (index === -1) {
-              const data = { name, url: BASE_URL + name }
-              setFileList((list) => list.concat(data))
-              insert(data)
-            }
           } else if (error.request) {
             console.log(error.request, 'request')
           } else {
             console.log('Error', error.message)
           }
-          console.log(error.config)
         })
         .finally(() => {
           setFile(null)
@@ -97,6 +104,31 @@ const UploadPage: React.FC = () => {
   const onBeforeUpload = (file: RcFile) => {
     setFile(file)
     return false
+  }
+
+  const onDelete = (file: ImageData) => {
+    const title = `Do you Want to delete ${file.name}?`
+    Modal.confirm({
+      title,
+      onOk() {
+        axios({
+          url: '/api/delete',
+          method: 'DELETE',
+          params: {
+            path: encodeURIComponent(file.name),
+            sha: file.sha,
+          },
+        })
+          .then(() => {
+            setFileList((list) => list.filter((item) => item.sha !== file.sha))
+            message.success(`删除 ${file.name} 成功!`)
+          })
+          .catch((err) => {
+            console.error(err)
+            message.error(`删除 ${file.name}失败!`)
+          })
+      },
+    })
   }
   return (
     <Row gutter={[16, 16]}>
@@ -160,10 +192,57 @@ const UploadPage: React.FC = () => {
       </Col>
       {fileList.map((file) => (
         <Col {...colProps} key={file.name}>
-          <Image src={file.url} alt={file.name} />
-          <Paragraph ellipsis={{ tooltip: file.url }} copyable>
-            {file.url}
+          <Image src={file.download_url} alt={file.name} />
+          <Paragraph ellipsis={{ tooltip: file.download_url }} copyable>
+            {file.download_url}
           </Paragraph>
+          <div className="delete-icon">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 48 48"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              onClick={() => onDelete(file)}
+            >
+              <rect width="48" height="48" fill="white" fillOpacity="0.01" />
+              <path
+                d="M9 10V44H39V10H9Z"
+                fill="none"
+                stroke="#666"
+                strokeWidth="4"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M20 20V33"
+                stroke="#666"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M28 20V33"
+                stroke="#666"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M4 10H44"
+                stroke="#666"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M16 10L19.289 4H28.7771L32 10H16Z"
+                fill="none"
+                stroke="#666"
+                strokeWidth="4"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
         </Col>
       ))}
     </Row>
