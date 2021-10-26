@@ -27,7 +27,6 @@ export default async function handler(
         access_token: STATIC_TOKEN,
       },
     })
-    console.log(data);
     res.status(200).json(data as Data[])
   } catch (error: any) {
     res
