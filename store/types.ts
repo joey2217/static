@@ -26,7 +26,7 @@ export function getConfig(): RepoConfig {
     accessToken: '',
   }
   try {
-    const config = window.localStorage[LOCAL_CONFIG]
+    const config = localStorage[LOCAL_CONFIG]
     return config ? JSON.parse(config) : defaultConfig
   } catch (error) {
     console.error(error)
@@ -35,7 +35,7 @@ export function getConfig(): RepoConfig {
 }
 
 export function setConfig(config: RepoConfig) {
-  window.localStorage[LOCAL_CONFIG] = JSON.stringify(config)
+   localStorage[LOCAL_CONFIG] = JSON.stringify(config)
 }
 
 export function validateConfig({ owner, repo, accessToken }: RepoConfig) {

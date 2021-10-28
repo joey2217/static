@@ -15,8 +15,6 @@ import { RcFile } from 'antd/lib/upload'
 import {
   DeleteOutlined,
   FileAddOutlined,
-  FileImageOutlined,
-  FileOutlined,
   InboxOutlined,
 } from '@ant-design/icons'
 import { useRecoilValue } from 'recoil'
@@ -27,7 +25,7 @@ import { ImageData } from '../store/types'
 const { Paragraph } = Typography
 
 const colProps: ColProps = {
-  xs: 24,
+  xs: 12,
   sm: 12,
   md: 6,
   lg: 4,
@@ -82,7 +80,8 @@ const UploadPage: React.FC = () => {
       <Head>
         <title>
           💾Static
-          {repoConfig.owner && `-${repoConfig.owner}/${repoConfig.repo}`}💼
+          {repoConfig.accessToken && `-${repoConfig.owner}/${repoConfig.repo}`}
+          💼
         </title>
         <meta name="description" content="static assets,upload" />
         <link rel="icon" href="/favicon.ico" />
@@ -107,9 +106,10 @@ const UploadPage: React.FC = () => {
               {imageReg.test(file.download_url) ? (
                 <Image
                   src={file.download_url}
-                  alt={file.name}
+                  alt={file.name.substr(0, 30)}
                   width={100}
                   height={100}
+                  fallback="https://via.placeholder.com/100/000000/FFFFFF?text=ERROR"
                 />
               ) : (
                 <FileAddOutlined style={{ fontSize: '40px' }} />

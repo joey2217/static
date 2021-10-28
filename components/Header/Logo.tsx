@@ -11,9 +11,11 @@ const Logo: React.FC = () => {
   return (
     <div>
       <span>Static</span>
-      <Button type="link" onClick={goRepo}>
-        {repoConfig.owner + '/' + repoConfig.repo}
-      </Button>
+      {repoConfig.accessToken && (
+        <Button type="link" onClick={goRepo}>
+          {repoConfig.owner + '/' + repoConfig.repo}
+        </Button>
+      )}
     </div>
   )
 }
