@@ -62,7 +62,9 @@ const UploadPage: React.FC = () => {
 
   const onDelete = (file: ImageData) => {
     Modal.confirm({
-      title: `Do you Want to delete ${file.name}?`,
+      title: `确认删除 ${file.name}?`,
+      okText:'确定',
+      cancelText:'取消',
       onOk() {
         deleteFile(file)
           .then(() => {
