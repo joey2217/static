@@ -5,40 +5,34 @@ import {
   Col,
   ColProps,
   message,
-  Image,
-  Typography,
   Modal,
-  Button,
+  Empty,
+  Skeleton,
+  Space,
 } from 'antd'
 import Head from 'next/head'
 import { RcFile } from 'antd/lib/upload'
-import {
-  DeleteOutlined,
-  FileAddOutlined,
-  InboxOutlined,
-} from '@ant-design/icons'
+import { InboxOutlined } from '@ant-design/icons'
 import { useRecoilValue } from 'recoil'
 import { repoConfigState } from '../store/atom'
 import { useUpload, useFileList } from '../store/hooks'
 import { ImageData } from '../store/types'
-
-const { Paragraph } = Typography
+import FileCard from '../components/FileCard'
 
 const colProps: ColProps = {
   xs: 12,
   sm: 12,
   md: 6,
-  lg: 4,
-  xl: 3,
+  lg: 6,
+  xl: 4,
+  xxl: 3,
 }
-
-const imageReg = /\.(png|jpg|gif|jpeg|webp)$/
 
 const UploadPage: React.FC = () => {
   const repoConfig = useRecoilValue(repoConfigState)
   const upload = useUpload()
   const [file, setFile] = useState<RcFile | null>(null)
-  const { fileList, deleteFile } = useFileList()
+  const { loading, fileList, deleteFile } = useFileList()
 
   useEffect(() => {
     if (file) {
@@ -63,8 +57,8 @@ const UploadPage: React.FC = () => {
   const onDelete = (file: ImageData) => {
     Modal.confirm({
       title: `确认删除 ${file.name}?`,
-      okText:'确定',
-      cancelText:'取消',
+      okText: '确定',
+      cancelText: '取消',
       onOk() {
         deleteFile(file)
           .then(() => {
@@ -102,36 +96,27 @@ const UploadPage: React.FC = () => {
             <p className="ant-upload-text">点击或拖拽上传</p>
           </Upload.Dragger>
         </Col>
-        {fileList.map((file) => (
-          <Col {...colProps} key={file.name}>
-            <div className="file">
-              {imageReg.test(file.download_url) ? (
-                <Image
-                  src={file.download_url}
-                  alt={file.name.substr(0, 30)}
-                  width={100}
-                  height={100}
-                  fallback="https://via.placeholder.com/100/000000/FFFFFF?text=ERROR"
-                />
-              ) : (
-                <FileAddOutlined style={{ fontSize: '40px' }} />
-              )}
-            </div>
-            <Paragraph ellipsis={{ tooltip: file.download_url }} copyable>
-              {file.download_url}
-            </Paragraph>
-            <div className="delete-icon">
-              <Button
-                danger
-                onClick={() => onDelete(file)}
-                icon={<DeleteOutlined />}
-                size="small"
-              >
-                删除
-              </Button>
-            </div>
+        {loading ? (
+          <Col span={24}>
+            <Space size="large">
+              <Skeleton.Image />
+              <Skeleton.Image />
+              <Skeleton.Image />
+              <Skeleton.Image />
+            </Space>
+            <Skeleton />
           </Col>
-        ))}
+        ) : fileList.length ? (
+          fileList.map((file) => (
+            <Col {...colProps} key={file.name}>
+              <FileCard file={file} onDelete={onDelete} />
+            </Col>
+          ))
+        ) : (
+          <Col span={24} className="list-empty">
+            <Empty />
+          </Col>
+        )}
       </Row>
     </>
   )

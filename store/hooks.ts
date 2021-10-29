@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import axios from 'axios'
 import { RcFile } from 'antd/lib/upload'
@@ -45,12 +45,14 @@ export function useUpload() {
 }
 
 export function useFileList() {
+  const [loading, setLoading] = useState(false)
   const repoConfig = useRecoilValue(repoConfigState)
   const [fileList, setFileList] = useRecoilState(fileListState)
   const { owner, repo, accessToken } = repoConfig
   // get list
   useEffect(() => {
     if (accessToken) {
+      setLoading(true)
       axios({
         url: `https://gitee.com/api/v5/repos/${owner}/${repo}/contents/static`,
         method: 'GET',
@@ -64,6 +66,9 @@ export function useFileList() {
         .catch((err) => {
           console.error(err)
           setFileList([])
+        })
+        .finally(() => {
+          setLoading(false)
         })
     }
   }, [repoConfig])
@@ -87,6 +92,7 @@ export function useFileList() {
   }
 
   return {
+    loading,
     fileList,
     deleteFile,
   }

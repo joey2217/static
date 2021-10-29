@@ -20,14 +20,14 @@
   text-align: center;
 }
 
-.delete-icon {
-  text-align: center;
-}
-.file {
-  box-sizing: content-box;
-  border: 1px solid #262626;
-  height: 100px;
+.card-cover {
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 206px;
+  border-bottom: 1px solid #262626;
+}
+
+.list-empty{
+  text-align: center;
 }
