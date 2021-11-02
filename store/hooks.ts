@@ -51,7 +51,7 @@ export function useFileList() {
   const { owner, repo, accessToken } = repoConfig
   // get list
   useEffect(() => {
-    if (accessToken) {
+    if (accessToken && repo) {
       setLoading(true)
       axios({
         url: `https://gitee.com/api/v5/repos/${owner}/${repo}/contents/static`,

@@ -31,3 +31,8 @@
 .list-empty{
   text-align: center;
 }
+.avatar{
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}

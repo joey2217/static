@@ -9,7 +9,7 @@
 - 配置仓库
 - enjoy!
 
-![gitee 配置](https://gitee.com/burning2017/test-page/raw/master/static/gitee-config.jpeg 'gitee 配置')
+![gitee 配置](https://gitee.com/burning2017/static/raw/master/static/gitee-config.jpeg 'gitee 配置')
 
 ## [Static](https://static-sandy.vercel.app/)
 
